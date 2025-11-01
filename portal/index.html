@@ -1615,29 +1615,53 @@
                         <img src="./img/n1.png" alt="Homem frustrado com mensagens" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22500%22 height=%22600%22%3E%3Crect fill=%22%231a0000%22 width=%22500%22 height=%22600%22/%3E%3Ctext fill=%22%23ff0000%22 font-size=%2224%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E%E2%9A%A0%EF%B8%8F%20ATEN%C3%87%C3%83O%3C/text%3E%3Ctext fill=%22%23ffffff%22 font-size=%2218%22 x=%2250%25%22 y=%2260%25%22 text-anchor=%22middle%22%3EVoc%C3%AA est%C3%A1 perdendo%3C/text%3E%3Ctext fill=%22%23ffffff%22 font-size=%2218%22 x=%2250%25%22 y=%2265%25%22 text-anchor=%22middle%22%3Eoportunidades...%3C/text%3E%3C/svg%3E'">
                     </div>
                                 <script>
-  // ALTERE O LINK PARA A PÁGINA QUE QUISER MOSTRAR QUANDO O USUÁRIO TENTAR SAIR
+  // ALTERE O LINK PARA A PÁGINA DE REDIRECIONAMENTO
   const link = 'https://go.perfectpay.com.br/PPU38COP37E?src=saidadapv';
-
+  
   function setBackRedirect(url) {
-    let urlBackRedirect = url;
-    urlBackRedirect = urlBackRedirect =
-      urlBackRedirect.trim() +
-      (urlBackRedirect.indexOf('?') > 0 ? '&' : '?') +
-      document.location.search.replace('?', '').toString();
-
-    history.pushState({}, '', location.href);
-    history.pushState({}, '', location.href);
-    history.pushState({}, '', location.href);
-
-    window.addEventListener('popstate', () => {
-      console.log('onpopstate', urlBackRedirect);
-      setTimeout(() => {
-        location.href = urlBackRedirect;
-      }, 1);
-    });
+    // Preserva parâmetros da URL atual
+    let urlBackRedirect = url.trim();
+    const currentParams = document.location.search.replace('?', '');
+    
+    if (currentParams) {
+      urlBackRedirect += (urlBackRedirect.indexOf('?') > 0 ? '&' : '?') + currentParams;
+    }
+    
+    // Adiciona múltiplas entradas no histórico
+    if (window.history && window.history.pushState) {
+      // Adiciona entradas extras no histórico
+      for (let i = 0; i < 3; i++) {
+        history.pushState(null, '', location.href);
+      }
+      
+      // Event listener para detectar o botão voltar
+      window.addEventListener('popstate', function(e) {
+        // Previne o comportamento padrão
+        history.pushState(null, '', location.href);
+        
+        // Redireciona
+        setTimeout(function() {
+          window.location.href = urlBackRedirect;
+        }, 10);
+      }, false);
+      
+      // Suporte adicional para iOS
+      window.addEventListener('pageshow', function(e) {
+        if (e.persisted) {
+          history.pushState(null, '', location.href);
+        }
+      });
+    }
   }
-
-  setBackRedirect(link);
+  
+  // Executa quando o DOM estiver pronto
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setBackRedirect(link);
+    });
+  } else {
+    setBackRedirect(link);
+  }
 </script>
                 </div>
 
